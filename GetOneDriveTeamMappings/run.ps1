@@ -1,3 +1,9 @@
+<#
+
+Function App URL: https://onedrivemapper4827.azurewebsites.net/api/GetOneDriveTeamMappings?code=BhQq7isH5jj0WCcxtbQSrdkLjS29jWOdQvPnabj95zLaAzFujWgOKw==
+
+#>
+
 using namespace System.Net
 
 # Input bindings are passed in via param block.
@@ -12,10 +18,10 @@ if (-not $userEmail) {
     $userEmail = $Request.Body.userEmail
 }
 
-$body = "This HTTP triggered function executed successfully. Pass userEmail in the query string to request the OneDrive Teams mapping information for that user."
+$body = ConvertTo-Json(@{ReturnCode = 0; Message = "This HTTP triggered function executed successfully. Pass userEmail in the query string to request the OneDrive Teams mapping information for that user."})
 
 if ($userEmail) {
-    $body = "Returning OneDrive Teams mapping information for $userEmail."
+    $body = ConvertTo-Json(@{ReturnCode = 0; Message = "Returning OneDrive Teams mapping information for $userEmail."})
 }
 
 # Associate values to output bindings by calling 'Push-OutputBinding'.
