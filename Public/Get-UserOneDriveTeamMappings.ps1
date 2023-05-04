@@ -36,7 +36,6 @@ Function Get-UserOneDriveTeamMappings {
 
     if ($postCallResult.error) {
 
-        #$postCallResult | ConvertTo-Json -Depth 2
         if ($postCallResult.exception.response.StatusCode) {
             Write-Error ("Error connecting: Response was {0} - {1}" -f $postCallResult.exception.response.StatusCode, $postCallResult.exception.response.StatusDescription)
         } else {
