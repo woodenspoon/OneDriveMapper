@@ -11,10 +11,10 @@ $userEmail = $Request.Query.userEmail
 if (-not $userEmail) {
     $userEmail = $Request.Body.userEmail
 }
-
+<#
 try {
     # Logging in to Azure.
-    Connect-AzAccount -Identity
+    #Connect-AzAccount -Identity
 
     # Get token and connect to MgGraph
     Connect-MgGraph -AccessToken ((Get-AzAccessToken -ResourceTypeName MSGraph).token)
@@ -25,8 +25,8 @@ try {
 
 # Test if we can get users:
 $body = Get-MgUser -All
+#>
 
-<#
 $body = @{ReturnCode = 1; Message = "This HTTP triggered function executed successfully. Pass userEmail in the query string to request the OneDrive Teams mapping information for that user."}
 
 if ($userEmail) {
@@ -57,7 +57,6 @@ if ($userEmail) {
         }
     )}
 }
-#>
 
 # Associate values to output bindings by calling 'Push-OutputBinding'.
 Push-OutputBinding -Name Response -Value ([HttpResponseContext]@{
