@@ -8,4 +8,6 @@
     'Az.ManagedServiceIdentity' = '1.*'
     'Az.Accounts' = '1.*'
     'Az.Automation' = '1.*'
+    'Microsoft.Graph.Authentication' = '0.*'
+    'Microsoft.Graph.Users' = '0.*'
 }
