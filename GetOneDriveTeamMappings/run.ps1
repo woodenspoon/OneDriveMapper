@@ -40,7 +40,7 @@ try {
     $userGroupsIDs = $userGroups | Where-Object {$null -eq $_.DeletedDateTime} | Select-Object -ExpandProperty Id
 
     # Determine which Teams folder to map for this user and return it
-    $syncUrls = $OneDriveSyncUrls | Where-Object {$_.GroupId -in $userGroupsIDs}
+    $syncUrls = $OneDriveSyncUrls #| Where-Object {$_.GroupId -in $userGroupsIDs}
     $body = $syncUrls | ConvertTo-Json
     $retCode = [HttpStatusCode]::OK
 
