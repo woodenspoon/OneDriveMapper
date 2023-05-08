@@ -12,17 +12,46 @@ if (-not $userEmail) {
     $userEmail = $Request.Body.userEmail
 }
 
-$body = "This HTTP triggered function executed successfully. Pass a userEmail in the query string or in the request body for a personalized response."
+# Process the request
+try {
 
-if ($userEmail) {
+    # Retrieve the valid OneDrive URLs
+    $OneDriveSyncUrls = $ENV:OneDriveSyncUrls
+    if (-not $OneDriveSyncUrls) {
+        throw "Azure Function App environment variable 'OneDriveSyncUrls' missing."
+    }
+    $OneDriveSyncUrls = ($ENV:OneDriveSyncUrls).Value | ConvertFrom-Json
+
+    # Retrieve the user email
+    if (-not $userEmail) {
+        throw "Missing userEmail parameter"
+    }
+
+    # Determine the groups this user belongs to
     Import-Module Microsoft.Graph.Authentication
     Import-Module Microsoft.Graph.Users
     Connect-MgGraph -AccessToken ((Get-AzAccessToken -ResourceTypeName MSGraph).token)
-    $body = Get-MgUserMemberOf -UserId $userEmail | ConvertTo-Json
+    $userGroups = Get-MgUserMemberOf -UserId $userEmail
+
+    # If the user is found, get the ID of the groups it belongs to
+    if (-not $userGroups) {
+        throw "Unknown user '$userEmail'"
+    }
+    $userGroupsIDs = $userGroups | Where-Object {$null -eq $_.DeletedDateTime} | Select-Object -ExpandProperty Id
+
+    $body = $userGroupsIDs | ConvertTo-Json
+    $retCode = [HttpStatusCode]::OK
+
+} catch {
+
+    # Report errors back to the caller
+    $body = $_.Exception.Message
+    $retCode = [HttpStatusCode]::NonAuthoritativeInformation
+
 }
 
 # Associate values to output bindings by calling 'Push-OutputBinding'.
 Push-OutputBinding -Name Response -Value ([HttpResponseContext]@{
-    StatusCode = [HttpStatusCode]::OK
+    StatusCode = $retCode
     Body = $body
 })
