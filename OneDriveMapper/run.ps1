@@ -7,18 +7,18 @@ param($Request, $TriggerMetadata)
 Write-Host "PowerShell HTTP trigger function processed a request."
 
 # Interact with query parameters or the body of the request.
-$name = $Request.Query.Name
-if (-not $name) {
-    $name = $Request.Body.Name
+$userEmail = $Request.Query.userEmail
+if (-not $userEmail) {
+    $userEmail = $Request.Body.userEmail
 }
 
-$body = "This HTTP triggered function executed successfully. Pass a name in the query string or in the request body for a personalized response."
+$body = "This HTTP triggered function executed successfully. Pass a userEmail in the query string or in the request body for a personalized response."
 
-if ($name) {
+if ($userEmail) {
     Import-Module Microsoft.Graph.Authentication
     Import-Module Microsoft.Graph.Users
     Connect-MgGraph -AccessToken ((Get-AzAccessToken -ResourceTypeName MSGraph).token)
-    $body = Get-MgUserMemberOf -UserId $name | ConvertTo-Json
+    $body = Get-MgUserMemberOf -UserId $userEmail | ConvertTo-Json
 }
 
 # Associate values to output bindings by calling 'Push-OutputBinding'.
