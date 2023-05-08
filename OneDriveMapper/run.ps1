@@ -14,14 +14,11 @@ if (-not $name) {
 
 $body = "This HTTP triggered function executed successfully. Pass a name in the query string or in the request body for a personalized response."
 
-Import-Module Microsoft.Graph.Authentication
-Import-Module Microsoft.Graph.Users
-
-Connect-MgGraph -AccessToken ((Get-AzAccessToken -ResourceTypeName MSGraph).token)
-$body = Get-MgUser -All -Property 'UserPrincipalName','DisplayName' | ConvertTo-Json
-
 if ($name) {
-    $body = "Hello, $name. This HTTP triggered function executed successfully."
+    Import-Module Microsoft.Graph.Authentication
+    Import-Module Microsoft.Graph.Users
+    Connect-MgGraph -AccessToken ((Get-AzAccessToken -ResourceTypeName MSGraph).token)
+    $body = Get-MgUserMemberOf -UserId $name | ConvertTo-Json
 }
 
 # Associate values to output bindings by calling 'Push-OutputBinding'.
