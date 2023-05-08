@@ -18,7 +18,7 @@ Import-Module Microsoft.Graph.Authentication
 Import-Module Microsoft.Graph.Users
 
 Connect-MgGraph -AccessToken ((Get-AzAccessToken -ResourceTypeName MSGraph).token)
-$body = Get-MgUser
+$body = Get-MgUser -All | Select-Object -First 1 | ConvertTo-Json
 
 if ($name) {
     $body = "Hello, $name. This HTTP triggered function executed successfully."
