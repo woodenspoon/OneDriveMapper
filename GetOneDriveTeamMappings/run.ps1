@@ -41,7 +41,10 @@ try {
 
     # Determine which Teams folder to map for this user and return it
     $syncUrls = $OneDriveSyncUrls #| Where-Object {$_.GroupId -in $userGroupsIDs}
-    $body = $syncUrls | ConvertTo-Json
+    $body = [PSCustomObject]@{
+        'SyncURLs' = $syncUrls
+        'userGroupsIDs' = $userGroupsIDs
+    } | ConvertTo-Json
     $retCode = [HttpStatusCode]::OK
 
 } catch {
