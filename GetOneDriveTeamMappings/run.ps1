@@ -20,7 +20,7 @@ try {
     if (-not $OneDriveSyncUrls) {
         throw "Azure Function App environment variable 'OneDriveSyncUrls' missing."
     }
-    $OneDriveSyncUrls = ($ENV:OneDriveSyncUrls).Value | ConvertFrom-Json
+    $OneDriveSyncUrls = $ENV:OneDriveSyncUrls | ConvertFrom-Json
 
     # Retrieve the user email
     if (-not $userEmail) {
