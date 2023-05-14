@@ -13,7 +13,7 @@ This is required to allow that user to then fetch the SharePoint details for tho
 The role to assign to the user, defaults to 'Member' but could also be set to 'Owner'
 
 #>
-Function Set-UserAdMemberOfAllTeams {
+Function Set-UserAsMemberOfAllTeams {
 
     [CmdletBinding()]
     Param(
