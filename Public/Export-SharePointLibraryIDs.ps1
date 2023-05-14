@@ -113,27 +113,3 @@ Function Export-SharePointLibraryIDs {
     }
 
 }
-
-<#
-
-# Get the list of existing OneDrive synced folders as patterns to match each new Teams path against
-$syncedFoldersPattern = (Get-Item "HKCU:\SOFTWARE\Microsoft\OneDrive\Accounts\Business1\Tenants\$($tenantTitle)").Property | ForEach-Object {
-    $elem = $_ -split '\\'
-    $elem[3] = '.*'
-    ($elem -join '\') -replace '\\', '\\'
-}
-
-$channelUrl = ("userEmail=christian@wooden-spoon.com&siteId={{{0}}}&webId={{{1}}}&webTitle={2}&webUrl={3}&listId={{{4}}}&folderId={{{5}}}&folderName={6}&folderUrl={7}&version=1&scope=OPENFOLDER" -f $siteId, $webId, $webTitle, $webUrl, $listId, $folderId, $ChannelTitle, $folderUrl)
-$channelLaunch = "odopen://sync/?" + ($channelUrl -replace '{','%7B' -replace '}','%7D' -replace ' ', '%20' -replace ':','%3A' -replace '/','%2F')
-$ODpath = ("{0}\{1}\{2} - {3}" -f $ENV:USERPROFILE, $tenantTitle, $webTitle, $ChannelTitle)
-
-if ($ODpath -match $syncedFoldersPattern) {
-    Write-Host "$ODPath already synced, skipping" -ForegroundColor Green
-} elseif (Test-Path $ODPath) {
-    Write-Host "$ODPath already exists on file system, skipping to avoid conflict" -ForegroundColor Cyan
-} else {
-    Write-Host "$ODPath does not exist, mounting it to access $folderUrl" -ForegroundColor Red
-    #Start-Process $channelLaunch
-}
-
-#>
