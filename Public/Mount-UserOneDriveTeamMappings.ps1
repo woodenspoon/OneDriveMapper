@@ -13,7 +13,8 @@ Function Mount-UserOneDriveTeamMappings {
     Param(
         [ValidatePattern('^[a-zA-Z0-9]+$')][String]$OneDriveMapperFunctionApp,
         [ValidatePattern('^[A-Za-z0-9+/=]|=[^=]|={3,}$')][String]$OneDriveMapperAuthKey,
-        [String]$userEmail
+        [String]$UserEmail,
+        [switch]$DryRun
     )
 
     # Derive the parameters if they were not explicitely passed
@@ -54,7 +55,15 @@ Function Mount-UserOneDriveTeamMappings {
 
     try {
 
-        $results = Invoke-RestMethod -Uri $url -Method Post -Body $body -Headers $headers -ContentType "application/json"
+        $results = Invoke-WebRequest -Uri $url -Method Post -Body $body -Headers $headers -ContentType "application/json"
+
+        # Process the response
+        if ($results.StatusCode -ne 200) {
+            $postCallResult.exception = @{'response' = @{'StatusCode' = $results.StatusCode; 'StatusDescription' = $results.Content}}
+            $postCallResult.error = $true
+        } else {
+            $results = $results.Content | ConvertFrom-Json
+        }
 
     } catch {
 
@@ -78,8 +87,8 @@ Function Mount-UserOneDriveTeamMappings {
         $results | ForEach-Object {
 
             # URI to sync this folder
-            $channelUrl = ("userEmail=christian@wooden-spoon.com&siteId={{{0}}}&webId={{{1}}}&webTitle={2}&webUrl={3}&listId={{{4}}}&folderId={{{5}}}&folderName={6}&folderUrl={7}&version=1&scope=OPENFOLDER" -f `
-                $_.SiteId, $_.WebId, $_.WebTitle, $_.WebUrl, $_.ListId, $_.FolderId, $_.ChannelTitle, $_.FolderUrl)
+            $channelUrl = ("userEmail={0}&siteId={{{1}}}&webId={{{2}}}&webTitle={3}&webUrl={4}&listId={{{5}}}&folderId={{{6}}}&folderName={7}&folderUrl={8}&version=1&scope=OPENFOLDER" -f `
+                $userEmail, $_.SiteId, $_.WebId, $_.WebTitle, $_.WebUrl, $_.ListId, $_.FolderId, $_.ChannelTitle, $_.FolderUrl)
             $channelLaunch = "odopen://sync/?" + ($channelUrl -replace '{','%7B' -replace '}','%7D' -replace ' ', '%20' -replace ':','%3A' -replace '/','%2F')
 
             # Expected local path
@@ -88,13 +97,13 @@ Function Mount-UserOneDriveTeamMappings {
 
             # Expected registry mapping (which may have been done when the tenant name was different)
             $ODpattern = ("{0}\{1}\{2} - {3}" -f $ENV:USERPROFILE, ".*", $sanitizedWebTitle, $_.ChannelTitle) -replace '\\', '\\'
-            $ODreg = Get-Item "HKCU:\SOFTWARE\Microsoft\OneDrive\Accounts\Business1\Tenants\$($tenantTitle)" -ErrorAction SilentlyContinue
+            $ODreg = Get-Item ("HKCU:\SOFTWARE\Microsoft\OneDrive\Accounts\Business1\Tenants\{0}" -f $_.TenantTitle) -ErrorAction SilentlyContinue
             if ($ODreg) {
                 $ODfolder = $ODReg.Property | Where-Object {$_ -match $ODpattern}
             } else {
                 $ODfolder = $null
             }
-            
+
             # Decide on course of action
             if ($ODFolder) {
                 if ($ODFolder -ne $ODPath) {
@@ -108,13 +117,17 @@ Function Mount-UserOneDriveTeamMappings {
                 if (Test-Path $ODPath) {
                     # A folder exists, cannot sync without user intervention
                     Write-Host "Re-syncing $($_.WebTitle) that was PREVIOUSLY synced to folder: $ODPath, pausing for 20 seconds" -ForegroundColor Yellow
-                    Start-Process $channelLaunch
-                    Start-Sleep -Seconds 20
+                    if (-not $DryRun) {
+                        Start-Process $channelLaunch
+                        Start-Sleep -Seconds 20
+                    }
                 } else {
                     # Sync folder
                     Write-Host "Syncing $($_.WebTitle) to folder: $ODPath, pausing for 20 seconds" -ForegroundColor Green
-                    Start-Process $channelLaunch
-                    Start-Sleep -Seconds 20
+                    if (-not $DryRun) {
+                        Start-Process $channelLaunch
+                        Start-Sleep -Seconds 20
+                    }
                 }
             }
 

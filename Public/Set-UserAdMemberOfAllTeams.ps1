@@ -1,13 +1,12 @@
 <#
 .SYNOPSIS
 
-Save the Teams SharePoint library IDs into an Azure App Function.
+Adds a Global Admin to all Teams.
 
 .DESCRIPTION
 
-This function will connect to a tenant and find the Azure App Function matching the pattern 'OneDriveMapper*'.
-Once found, the function will read the CSV file containing the library IDs and save a JSON representation into the Variable name 'OneDriveSyncUrls'.
-This information is used by the Azure App Function to return all the authorized Library IDs for a particular user when called at logon time.
+This function will login to a tenant and assign the logged in user to all the Teams as either a Member or an Owner.
+This is required to allow that user to then fetch the SharePoint details for those Teams in order to generate the OneDrive map for syncing them.
 
 .PARAMETER Role
 
@@ -33,8 +32,8 @@ Function Set-UserAdMemberOfAllTeams {
         $tenantTitle = Get-AzureADTenantDetail | Select-Object -ExpandProperty DisplayName
         Write-Host "Connected to $tenant.onmicrosoft.com ($tenantTitle) as $loggedInAdmin." -ForegroundColor Cyan
         
-        # Make sure we are an owner on all the Teams
-        Write-Host "Connecting to Microsoft Team. Please re-used the previous authentication credentials if offered." -ForegroundColor Green
+        # Make sure we are at least a member on all the Teams
+        Write-Host "Connecting to Microsoft Team. Please re-use the previous authentication credentials if offered." -ForegroundColor Green
         Connect-MicrosoftTeams -ErrorAction Stop | Out-Null
         Write-Host "Connected." -ForegroundColor Cyan
         

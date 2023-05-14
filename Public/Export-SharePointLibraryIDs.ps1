@@ -49,7 +49,7 @@ Function Export-SharePointLibraryIDs {
         Write-Host "Connected to $tenant.onmicrosoft.com ($tenantTitle) as $loggedInAdmin." -ForegroundColor Cyan
 
         # Get all the Teams' SharePoint site information
-        Write-Host "Connecting to SharePoint Online. Please re-used the previous authentication credentials if offered." -ForegroundColor Green
+        Write-Host "Connecting to SharePoint Online. Please re-use the previous authentication credentials if offered." -ForegroundColor Green
         Connect-PnPOnline -Url https://$tenant.sharepoint.com -Interactive -ErrorAction Stop | Out-Null
         Write-Host "Connected." -ForegroundColor Cyan
         Write-Host ""
