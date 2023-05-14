@@ -31,7 +31,7 @@ try {
     Import-Module Microsoft.Graph.Authentication
     Import-Module Microsoft.Graph.Users
     Connect-MgGraph -AccessToken ((Get-AzAccessToken -ResourceTypeName MSGraph).token)
-    $userGroups = Get-MgUserMemberOf -UserId $userEmail
+    $userGroups = Get-MgUserMemberOf -UserId $userEmail -ErrorAction Stop
     Write-Host "Found $($userGroups.Count) groups for user '$userEmail'"
 
     # If the user is found, get the ID of the groups it belongs to
