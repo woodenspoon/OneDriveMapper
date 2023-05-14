@@ -32,12 +32,16 @@ try {
     Import-Module Microsoft.Graph.Users
     Connect-MgGraph -AccessToken ((Get-AzAccessToken -ResourceTypeName MSGraph).token)
     $userGroups = Get-MgUserMemberOf -UserId $userEmail
+    Write-Host "Found $($userGroups.Count) groups for user '$userEmail'"
 
     # If the user is found, get the ID of the groups it belongs to
     if (-not $userGroups) {
         throw "Unknown user '$userEmail'"
     }
     $userGroupsIDs = $userGroups | Where-Object {$null -eq $_.DeletedDateTime} | Select-Object -ExpandProperty Id
+    $userGroupsIDs | ForEach-Object {
+        Write-Host "-- Group ID '$($_)'"
+    }
 
     # Determine which Teams folder to map for this user and return it
     $syncUrls = $OneDriveSyncUrls | Where-Object {$_.GroupId -in $userGroupsIDs}
