@@ -44,7 +44,7 @@ Function Mount-UserOneDriveTeamMappings {
     }
 
     # Announce which user is being considered
-    Write-Host "Attempting to mount Teams SharePoint libraries in OneDrive for user '$userEmail'" -ForegroundColor Blue
+    Write-Host "Attempting to mount Teams SharePoint libraries in OneDrive for user '$userEmail'" -ForegroundColor DarkBlue -BackgroundColor Cyan
 
     # Query the OneDriveMapper function app to retrieve the list of Teams information blocks
     [hashtable]$postCallResult = @{}
@@ -55,7 +55,7 @@ Function Mount-UserOneDriveTeamMappings {
 
     try {
 
-        $results = Invoke-WebRequest -Uri $url -Method Post -Body $body -Headers $headers -ContentType "application/json"
+        $results = Invoke-WebRequest -Uri $url -Method Post -Body $body -Headers $headers -ContentType "application/json" -UseBasicParsing
 
         # Process the response
         if ($results.StatusCode -ne 200) {
@@ -108,22 +108,22 @@ Function Mount-UserOneDriveTeamMappings {
             if ($ODFolder) {
                 if ($ODFolder -ne $ODPath) {
                     # Already synced to another folder (no action)
-                    Write-Host "$($_.WebTitle) synced to DIFFERENT folder: $ODFolder" -ForegroundColor Yellow
+                    Write-Host "$($_.WebTitle) synced to DIFFERENT folder: $ODFolder" -ForegroundColor Yellow -BackgroundColor Black
                 } else {
                     # Already synced (no action)
-                    Write-Host "$($_.WebTitle) synced to folder: $ODFolder" -ForegroundColor Blue
+                    Write-Host "$($_.WebTitle) synced to folder: $ODFolder" -ForegroundColor DarkBlue -BackgroundColor Cyan
                 }
             } else {
                 if (Test-Path $ODPath) {
                     # A folder exists, cannot sync without user intervention
-                    Write-Host "Re-syncing $($_.WebTitle) that was PREVIOUSLY synced to folder: $ODPath, pausing for 20 seconds" -ForegroundColor Yellow
+                    Write-Host "Re-syncing $($_.WebTitle) that was PREVIOUSLY synced to folder: $ODPath, pausing for 20 seconds" -ForegroundColor Yellow -BackgroundColor Black
                     if (-not $DryRun) {
                         Start-Process $channelLaunch
                         Start-Sleep -Seconds 20
                     }
                 } else {
                     # Sync folder
-                    Write-Host "Syncing $($_.WebTitle) to folder: $ODPath, pausing for 20 seconds" -ForegroundColor Green
+                    Write-Host "Syncing $($_.WebTitle) to folder: $ODPath, pausing for 20 seconds" -ForegroundColor DarkGreen -BackgroundColor Cyan
                     if (-not $DryRun) {
                         Start-Process $channelLaunch
                         Start-Sleep -Seconds 20
