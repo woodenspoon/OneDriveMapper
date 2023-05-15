@@ -18,6 +18,7 @@ Function Publish-SharePointLibraryIDs {
 
     [CmdletBinding()]
     Param(
+        [Parameter(Mandatory=$true)][String]$Subscription,
         [System.IO.FileInfo]$CSVFile = '.\OneDriveSyncUrls.csv'
     )
     
@@ -30,12 +31,16 @@ Function Publish-SharePointLibraryIDs {
     
         Write-Host "Connecting to Azure. Please sign-in with a Global Admin user for the target tenant in the next window." -ForegroundColor Green
         $azure = Connect-AzAccount
+        Set-AzContext -Subscription $Subscription
         $loggedInAdmin = $azure.Context.Account.Id
         $subscriptionName = $azure.Context.Subscription.Name
         Write-Host "Connected to Azure subscription '$subscriptionName' as $loggedInAdmin." -ForegroundColor Cyan
     
         Write-Host "Trying to retrieve Function App 'OneDriveMapper*'." -ForegroundColor Green
         $azapp = Get-AzFunctionApp | Where-Object Name -like 'OneDriveMapper*'
+        if (-not $azapp) {
+            throw "Unable to find Azure Function App 'OneDriveMapper*' in this subscription, aborting."
+        }
         Write-Host "Found app '$($azapp.Name)'." -ForegroundColor Cyan
     
         Write-Host "Setting 'OneDriveSyncUrls' value from CSV content." -ForegroundColor Green

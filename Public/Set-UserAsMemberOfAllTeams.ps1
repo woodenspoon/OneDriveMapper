@@ -1,12 +1,13 @@
 <#
 .SYNOPSIS
 
-Adds a Global Admin to all Teams.
+Adds a Microsoft 365 user to all Teams.
 
 .DESCRIPTION
 
 This function will login to a tenant and assign the logged in user to all the Teams as either a Member or an Owner.
 This is required to allow that user to then fetch the SharePoint details for those Teams in order to generate the OneDrive map for syncing them.
+The user does not need to be a Global Administrator.
 
 .PARAMETER Role
 
